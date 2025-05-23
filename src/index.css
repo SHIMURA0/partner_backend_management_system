@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+/* 全局样式 */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #f9fafb;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fafafa;
+}
+
+/* 代码字体 */
+code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* 自定义工具类 */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 渐变文字效果 */
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.text-transparent {
+  color: transparent;
+}
+
+/* AI聊天界面样式优化 */
+.ai-chat-input .ant-input {
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  padding: 16px 20px !important;
+  border-radius: 16px !important;
+  border: 2px solid #e5e7eb !important;
+  transition: all 0.3s ease !important;
+}
+
+.ai-chat-input .ant-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.ai-chat-input .ant-input::placeholder {
+  color: #9ca3af !important;
+  font-size: 16px !important;
+}
+
+/* 功能按钮样式 */
+.function-button {
+  transition: all 0.3s ease !important;
+  white-space: nowrap !important;
+}
+
+.function-button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 快速问题标签样式 */
+.quick-question-tag {
+  transition: all 0.2s ease !important;
+  border: 1px solid #e5e7eb !important;
+  background: white !important;
+  color: #374151 !important;
+}
+
+.quick-question-tag:hover {
+  border-color: #3b82f6 !important;
+  background: #eff6ff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* 发送按钮优化 */
+.send-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.send-button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3) !important;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
+}
+
+/* 深度思考开关样式 */
+.ant-switch-checked {
+  background-color: #3b82f6 !important;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Ant Design 样式调整 */
+.ant-layout-sider-collapsed .ant-layout-sider-trigger {
+  display: none;
+}
+
+.ant-menu-item-selected {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+
+.ant-menu-item-selected::after {
+  border-right: 3px solid #1890ff;
+}
+
+/* 响应式隐藏工具类 */
+@media (max-width: 768px) {
+  .md\:hidden {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .sm\:hidden {
+    display: none !important;
+  }
+}
