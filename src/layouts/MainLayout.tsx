@@ -78,7 +78,7 @@ export const MainLayout = () => {
   return (
     <div className="h-screen w-screen flex bg-gray-100">
       {/* Sidebar */}
-      <aside className={`transition-all duration-300 h-full bg-gray-100 flex flex-col flex-shrink-0 ${collapsed ? 'w-16' : 'w-[300px]'}`}>
+      <aside className={`transition-all duration-300 h-full bg-gray-100 flex flex-col flex-shrink-0 ${collapsed ? 'w-16' : 'w-[250px]'}`}>
         {/* Collapse/Expand Button */}
         <div className="p-3 flex">
           <Button
@@ -96,7 +96,7 @@ export const MainLayout = () => {
             </div>
             {!collapsed && (
               <div className="ml-3">
-                <span className="text-2xl font-semibold text-primary-500">谷禾菌识</span>
+                <span className="text-2xl font-semibold text-primary-500">谷禾健康</span>
               </div>
             )}
           </div>

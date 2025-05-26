@@ -208,7 +208,7 @@ export const mockApi = {
 
   sendChatMessage: async (message: string) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    const response = `这是对"${message}"的AI回复。我是谷禾菌识AI助手，专门为您解答肠道菌群相关问题。`;
+    const response = `这是对"${message}"的AI虚拟回复。我是谷禾菌识AI助手，专门为您解答肠道菌群相关问题。我是谷禾菌识AI助手，专门为您解答肠道菌群相关问题。我是谷禾菌识AI助手，专门为您解答肠道菌群相关问题。我是谷禾菌识AI助手，专门为您解答肠道菌群相关问题。我是谷禾菌识AI助手，专门为您解答肠道菌群相关问题。我是谷禾菌识AI助手，专门为您解答肠道菌群相关问题。`;
     return { success: true, data: { response } };
   },
 }; 

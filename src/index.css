@@ -163,3 +163,14 @@ code {
     display: none !important;
   }
 }
+
+/* AI聊天记录部分滚动条 */
+/* 隐藏滚动条但保持滚动功能 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE和Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari和Opera */
+}

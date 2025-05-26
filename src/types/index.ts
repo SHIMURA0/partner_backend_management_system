@@ -46,6 +46,13 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   attachments?: string[];
+  isTimelineMessage?: boolean;
+  timelineData?: {
+    organizing: boolean;
+    generating: boolean;
+    completed: boolean;
+    finalAnswer: string;
+  };
 }
 
 // 培训课程
