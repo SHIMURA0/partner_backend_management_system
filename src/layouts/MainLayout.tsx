@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ExperimentOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons';
+import { ExperimentOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined, FilePdfOutlined } from '@ant-design/icons';
 import { Menu, Avatar, Dropdown, Typography, Button } from 'antd';
 import type { MenuItem, User } from '../types';
 import { ROUTES, STORAGE_KEYS } from '../constants';
@@ -40,6 +40,12 @@ export const MainLayout = () => {
       icon: <ExperimentOutlined />,
       label: '谷禾菌识',
       path: ROUTES.AI_CHAT,
+    },
+    {
+      key: '/report-interpretation',
+      icon: <FilePdfOutlined />,
+      label: '报告解读',
+      path: '/report-interpretation',
     },
     {
       key: ROUTES.SAMPLE_MANAGEMENT,
@@ -105,7 +111,7 @@ export const MainLayout = () => {
         <nav className="flex-1 overflow-y-auto scrollbar-thin">
           <Menu
             mode="inline"
-            selectedKeys={[location.pathname]}
+            selectedKeys={[menuItems.find(item => location.pathname.startsWith(item.path || ''))?.key || location.pathname]}
             items={menuItems}
             onClick={handleMenuClick}
             className="!border-0 !bg-transparent"

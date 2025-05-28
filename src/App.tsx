@@ -7,6 +7,7 @@ import { Dashboard } from './pages/Dashboard';
 import { AIChat } from './pages/AIChat';
 import { SampleManagement } from './pages/SampleManagement';
 import { Training } from './pages/Training';
+import ReportInterpretation from './pages/ReportInterpretation';
 import { ROUTES } from './constants';
 import './App.css';
 
@@ -41,6 +42,7 @@ function App() {
             <Route path="ai-chat" element={<AIChat />} />
             <Route path="sample-management" element={<SampleManagement />} />
             <Route path="training" element={<Training />} />
+            <Route path="report-interpretation" element={<ReportInterpretation />} />
           </Route>
 
           {/* 404页面 */}
