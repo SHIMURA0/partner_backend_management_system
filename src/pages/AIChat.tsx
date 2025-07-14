@@ -46,6 +46,9 @@ import { mockApi, mockChatMessages } from '../services/mockData';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
+import guheLogo from '../assets/guhe_logo.png';
+import duijiaofenImg from '../assets/duijiaofen.png';
+import wechatLogo from '../assets/wechat.png'; // 路径根据实际情况调整
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;
@@ -110,6 +113,7 @@ export const AIChat = () => {
     completed: false,
     finalAnswer: ''
   });
+  const [showReferencesPanel, setShowReferencesPanel] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -167,10 +171,10 @@ export const AIChat = () => {
     {
       id: '1',
       title: '谷禾健康',
-      description: '专业肠道菌群检测与健康管理',
+      description: '谷禾健康',
       followers: '12万',
       category: '健康科普',
-      url: 'https://mp.weixin.qq.com/s/example1'
+      url: 'https://mp.weixin.qq.com/s/Euie7ALaGP59bP0I8GJYng?poc_token=HLm2cGijH23CLxHMdQNpljaQerS_-rxZzplBdvOz'
     },
     {
       id: '2',
@@ -195,6 +199,55 @@ export const AIChat = () => {
       followers: '4.8万',
       category: '学术研究',
       url: 'https://mp.weixin.qq.com/s/example4'
+    }
+  ];
+
+  // 参考文献数据
+  const references = [
+    {
+      id: '1',
+      title: '肠道菌群与免疫系统相互作用的研究进展',
+      authors: '张明, 李华, 王强',
+      journal: '微生物学报',
+      year: '2023',
+      doi: '10.13344/j.microbiol.china.2023.001',
+      abstract: '本文综述了肠道菌群与免疫系统之间的复杂相互作用机制，包括菌群对免疫细胞分化的影响以及免疫系统对菌群结构的调节作用。'
+    },
+    {
+      id: '2',
+      title: '益生菌在肠道健康中的作用机制',
+      authors: '陈静, 刘伟, 赵敏',
+      journal: '营养学报',
+      year: '2023',
+      doi: '10.13344/j.nutr.china.2023.002',
+      abstract: '探讨了益生菌通过调节肠道菌群结构、增强肠道屏障功能、调节免疫反应等多种途径促进肠道健康的机制。'
+    },
+    {
+      id: '3',
+      title: '肠道菌群与代谢性疾病的关系',
+      authors: '孙丽, 吴刚, 郑华',
+      journal: '中华医学杂志',
+      year: '2022',
+      doi: '10.13344/j.med.china.2022.003',
+      abstract: '系统分析了肠道菌群失调与肥胖、糖尿病等代谢性疾病发生发展的关系，为疾病预防和治疗提供新思路。'
+    },
+    {
+      id: '4',
+      title: '微生物组学技术在肠道菌群研究中的应用',
+      authors: '林涛, 周红, 马超',
+      journal: '生物技术通报',
+      year: '2022',
+      doi: '10.13344/j.biotech.china.2022.004',
+      abstract: '介绍了16S rRNA测序、宏基因组学等先进技术在肠道菌群研究中的应用，为菌群研究提供技术支撑。'
+    },
+    {
+      id: '5',
+      title: '饮食对肠道菌群的影响及其健康意义',
+      authors: '黄敏, 徐伟, 何芳',
+      journal: '食品科学',
+      year: '2023',
+      doi: '10.13344/j.food.china.2023.005',
+      abstract: '分析了不同饮食模式对肠道菌群结构的影响，探讨了饮食干预在菌群调节和健康维护中的作用。'
     }
   ];
 
@@ -469,8 +522,18 @@ export const AIChat = () => {
   // 返回首页并保存聊天记录
   const handleBackToHome = () => {
     saveCurrentChat();
+    // 立即重置所有相关状态，避免动画
     setMessages([]); // 清空当前消息
     setShowChat(false); // 返回首页
+    setActiveFunction(functions[0].key); // 重置为默认功能
+    setPdfFile(null);
+    setPdfUrl(null);
+    setPdfNumPages(0);
+    setPdfLoading(false);
+    setPdfDragOver(false);
+    setSelectedText('');
+    setShowAskAI(false);
+    setAskAIPos({ x: 0, y: 0 });
     // 重置AI处理状态
     setAiProcessing({
       organizing: false,
@@ -478,11 +541,22 @@ export const AIChat = () => {
       completed: false,
       finalAnswer: ''
     });
+    // 重置其他状态
+    setExpandedNodes({});
+    setExpandedSources({});
+    setShowSourcesSidebar(false);
+    setShowReferencesPanel(false);
+    setIsChatFocused(false);
+    setHistoryVisible(false);
+    setIsDragOver(false);
+    setUploadedFiles([]);
+    setFeedbackStates({});
   };
 
   // 切换来源展开状态
   const toggleSourceExpansion = (messageId: string) => {
     setShowSourcesSidebar(!showSourcesSidebar);
+    setShowReferencesPanel(!showReferencesPanel);
   };
 
   // 切换节点展开/收起状态
@@ -708,11 +782,11 @@ export const AIChat = () => {
 
   if (!showChat) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-white overflow-hidden relative gap-3">
+      <div className="h-screen w-full flex items-center justify-center  bg-white overflow-hidden relative gap-3">
         {/* 报告解读区 - 带动画 */}
         <div
           className={`
-            transition-all duration-500 ease-in-out
+            transition-all duration-300 ease-in-out
             ${activeFunction === '报告解读'
               ? 'w-3/4 opacity-100 translate-x-0'
               : 'w-0 opacity-0 -translate-x-full'
@@ -922,7 +996,7 @@ export const AIChat = () => {
                       type="primary"
                       shape="circle"
                       icon={<SendOutlined />}
-                      className="!border-none bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white flex items-center justify-center transition-all duration-300 ml-1 w-7 h-7 aspect-square"
+                      className="!border-none bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white flex items-center justify-center ml-1 w-7 h-7 aspect-square"
                       onClick={handleSend}
                       disabled={!inputValue.trim()}
                     />
@@ -952,7 +1026,7 @@ export const AIChat = () => {
     <div className="h-screen w-full flex items-center justify-center bg-transparent overflow-hidden relative">
       <div className="flex w-full h-full">
         {/* 主聊天区域 */}
-        <div className={`flex items-center justify-center transition-all duration-300 w-full`}>
+        <div className={`flex items-center justify-center w-full`}>
           <div className="w-full mx-auto flex flex-col items-center">
             {/* 返回按钮 - 主容器左上角 */}
             <div className="absolute top-4 left-4 z-10">
@@ -965,14 +1039,26 @@ export const AIChat = () => {
             </div>
             {/* 主容器 - 固定宽度白色圆角矩形 */}
             <div className={
-              `flex flex-row w-[800px] h-[90vh] bg-white rounded-lg mx-auto overflow-hidden relative transition-shadow duration-300`
+              `flex flex-row w-[900px] h-[90vh] bg-transparent rounded-lg mx-auto overflow-hidden relative transition-transform duration-300 ${
+                showReferencesPanel ? '-translate-x-40' : 'translate-x-0'
+              }`
             }>
               {/* 左侧灰色容器，仅报告解读时显示 */}
-              {activeFunction === '报告解读' && (
-                <div className="flex items-center justify-center h-full bg-gray-50 border-r w-2/3">
+              <div
+                className={`
+                  transition-all duration-300 ease-in-out
+                  ${activeFunction === '报告解读'
+                    ? 'w-2/3 opacity-100 translate-x-0'
+                    : 'w-0 opacity-0 -translate-x-full'
+                  }
+                  flex items-center justify-center h-full bg-gray-50 border-r overflow-hidden
+                `}
+                style={{ minWidth: 0 }}
+              >
+                {activeFunction === '报告解读' && (
                   <span className="text-gray-400">报告解读区</span>
-                </div>
-              )}
+                )}
+              </div>
               {/* 右侧AI聊天区 */}
               <div className={activeFunction === '报告解读' ? 'flex-1 h-full' : 'w-full h-full'}>
                 {/* 聊天主区域内容 */}
@@ -1026,7 +1112,7 @@ export const AIChat = () => {
                                                     onClick={() => toggleNodeExpansion(`saved-organizing-${message.id}`)}
                                                   >
                                                     {/*<FileTextOutlined className="mr-2 text-blue-500" />*/}
-                                                    <span className="text-sm text-green-600">
+                                                    <span className="text-sm font-bold text-gray-600">
                                                       整理资料
                                                     </span>
                                                     <Button
@@ -1042,12 +1128,35 @@ export const AIChat = () => {
                                                       <div className="flex items-center gap-2">
                                                         <div className="flex gap-2 overflow-x-auto scrollbar-hide flex-1">
                                                           {mockSources.slice(0, 3).map((source, index) => (
-                                                            <div key={source.id} className="flex-shrink-0 bg-blue-50 rounded-lg p-2 min-w-[120px]">
-                                                              <div className="flex items-center mb-1">
-                                                                <span className="text-blue-600 font-medium text-xs mr-1">{index + 1}</span>
-                                                                <Text className="text-xs font-medium text-gray-800 truncate">{source.title}</Text>
-                                                              </div>
-                                                              <Text className="text-xs text-gray-600 line-clamp-2">{source.description}</Text>
+                                                            <div
+                                                              key={source.id}
+                                                              className="flex-shrink-0 bg-gray-100 rounded-lg p-2 min-w-[120px] min-h-[120px] flex flex-col items-center justify-center hover:bg-blue-100 cursor-pointer transition-colors"
+                                                              onClick={() => window.open(source.url, '_blank')}
+                                                            >
+                                                              {index === 0 ? (
+                                                                <div className="flex flex-col items-center w-60">
+                                                                  <img
+                                                                    src={duijiaofenImg}
+                                                                    alt="对甲酚"
+                                                                    className="w-full h-24 object-cover rounded-lg mb-2"
+                                                                  />
+                                                                  <div className="flex items-center w-full justify-start ml-2">
+                                                                      <div className="flex items-center mr-auto mr-2">
+                                                                          <img src={wechatLogo} alt="wechat" className="w-4 h-4 mr-1" />
+                                                                          <span className="text-xs text-green-600">公众号</span>
+                                                                      </div>
+                                                                    <img src={guheLogo} alt="logo" className="w-4 h-4 mr-1 bg-transparent inline-block align-middle" />
+                                                                    <span className="!text-xs font-bold text-gray-800 truncate mr-2">{source.title}</span>
+
+                                                                  </div>
+                                                                </div>
+                                                              ) : (
+                                                                <div className="flex items-center">
+                                                                  {/*<span className="text-blue-600 font-medium text-xs mr-1">{index + 1}</span>*/}
+                                                                  <Text className="text-xs font-medium text-gray-800 truncate">{source.title}</Text>
+                                                                </div>
+                                                              )}
+                                                              {/*<Text className="text-xs text-gray-600 line-clamp-3">{source.description}</Text>*/}
                                                             </div>
                                                           ))}
                                                         </div>
@@ -1182,7 +1291,7 @@ export const AIChat = () => {
                                                 onClick={() => toggleNodeExpansion('organizing')}
                                               >
                                                 {/*<FileTextOutlined className="mr-2 text-blue-500" />*/}
-                                                <span className={`text-sm ${aiProcessing.organizing ? 'text-green-600' : 'text-gray-600'}`}>
+                                                <span className={`text-sm ${aiProcessing.organizing ? 'text-gray-600' : 'text-gray-600'}`}>
                                                   整理资料
                                                 </span>
                                                 {!aiProcessing.organizing && <Spin size="small" className="ml-2" />}
@@ -1205,12 +1314,12 @@ export const AIChat = () => {
                                                   <div className="flex items-center gap-2">
                                                     <div className="flex gap-2 overflow-x-auto scrollbar-hide flex-1">
                                                       {mockSources.slice(0, 3).map((source, index) => (
-                                                        <div key={source.id} className="flex-shrink-0 bg-blue-50 rounded-lg p-2 min-w-[120px]">
-                                                          <div className="flex items-center mb-1">
+                                                        <div key={source.id} className="flex-shrink-0 bg-blue-50 rounded-lg p-3 min-w-[120px] min-h-[80px]">
+                                                          <div className="flex items-center mb-2">
                                                             <span className="text-blue-600 font-medium text-xs mr-1">{index + 1}</span>
                                                             <Text className="text-xs font-medium text-gray-800 truncate">{source.title}</Text>
                                                           </div>
-                                                          <Text className="text-xs text-gray-600 line-clamp-2">{source.description}</Text>
+                                                          <Text className="text-xs text-gray-600 line-clamp-3">{source.description}</Text>
                                                         </div>
                                                       ))}
                                                     </div>
@@ -1262,7 +1371,7 @@ export const AIChat = () => {
                     </div>
 
                     {/* 输入区域 */}
-                    <div className="bg-transparent border-t border-gray-100">
+                    <div className="bg-transparent border-gray-100">
                       {/* 已上传文件显示区域 */}
                       {uploadedFiles.length > 0 && (
                         <div className="w-full mx-auto mb-2 px-4">
@@ -1370,7 +1479,7 @@ export const AIChat = () => {
                               type="primary"
                               shape="circle"
                               icon={<SendOutlined />}
-                              className="!border-none bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white flex items-center justify-center transition-all duration-300 ml-1 w-7 h-7 aspect-square"
+                              className="!border-none bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white flex items-center justify-center ml-1 w-7 h-7 aspect-square"
                               onClick={handleSend}
                               disabled={!inputValue.trim()}
                             />
@@ -1384,6 +1493,40 @@ export const AIChat = () => {
             </div>
           </div>
         </div>
+
+        {/* 参考文献面板 - 右侧弹出 */}
+        {showReferencesPanel && (
+          <div className="fixed right-8 top-8 bottom-8 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
+            <div className="flex items-center justify-between p-3 border-b border-gray-100">
+              <Text className="text-base font-medium text-gray-800">参考文献</Text>
+              <Button
+                type="text"
+                icon={<CloseOutlined />}
+                onClick={() => setShowReferencesPanel(false)}
+                className="text-gray-400 hover:text-gray-600"
+              />
+            </div>
+            <div className="h-full overflow-y-auto p-3 space-y-2">
+              {references.map((reference) => (
+                <div
+                  key={reference.id}
+                  className="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  <div className="mb-2">
+                    <Text className="text-xs font-medium text-gray-800 line-clamp-2">
+                      {reference.title}
+                    </Text>
+                  </div>
+                  <div>
+                    <Text className="text-xs text-gray-600 line-clamp-3">
+                      {reference.abstract}
+                    </Text>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
